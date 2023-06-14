@@ -27,34 +27,20 @@ def send_message(lessons, telegram_token, tg_chat_id):
 def get_notification(dvmn_token, telegram_token, chat_id, payload={}):
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': dvmn_token}
-    try:
-        response = requests.get(
-            url,
-            headers=headers,
-            timeout=95,
-            params=payload,
-        )
-        response.raise_for_status()
-        dvmn_response = json.loads(response.text)
-        if dvmn_response['status'] == 'timeout':
-            payload = {'timestamp': dvmn_response['timestamp_to_request']}
-            get_notification(dvmn_token, payload)
-        elif dvmn_response['status'] == 'found':
-            lessons = dvmn_response['new_attempts']
-            send_message(lessons, telegram_token, chat_id)
-    except requests.exceptions.HTTPError as err:
-        print('Ooops. HTTP Error occurred')
-        print('Response is: {content}'.format(content=err.response.content))
-    except requests.exceptions.ReadTimeout as err:
-        print('Ooops. ReadTimeout Error occurred')
-        print('Response is: {content}'.format(content=err))
-        print('Wait... I will try to send the request again')
-        time.sleep(10)
-    except requests.exceptions.ConnectionError as err:
-        print('Ooops. ConnectionError occurred')
-        print('Response is: {content}'.format(content=err))
-        print('Wait... I will try to send the request again')
-        time.sleep(10)
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=95,
+        params=payload,
+    )
+    response.raise_for_status()
+    dvmn_response = json.loads(response.text)
+    if dvmn_response['status'] == 'timeout':
+        payload = {'timestamp': dvmn_response['timestamp_to_request']}
+        get_notification(dvmn_token, payload)
+    elif dvmn_response['status'] == 'found':
+        lessons = dvmn_response['new_attempts']
+        send_message(lessons, telegram_token, chat_id)
 
 
 if __name__ == "__main__":
@@ -64,4 +50,18 @@ if __name__ == "__main__":
     telegram_token = env('TELEGRAM_TOKEN')
     tg_chat_id = env('CHAT_ID')
     while True:
-        get_notification(dvmn_token, telegram_token, tg_chat_id)
+        try:
+            get_notification(dvmn_token, telegram_token, tg_chat_id)
+        except requests.exceptions.HTTPError as err:
+            print('Ooops. HTTP Error occurred')
+            print('Response is: {content}'.format(content=err.response.content))
+        except requests.exceptions.ReadTimeout as err:
+            print('Ooops. ReadTimeout Error occurred')
+            print('Response is: {content}'.format(content=err))
+            print('Wait... I will try to send the request again')
+            time.sleep(10)
+        except requests.exceptions.ConnectionError as err:
+            print('Ooops. ConnectionError occurred')
+            print('Response is: {content}'.format(content=err))
+            print('Wait... I will try to send the request again')
+            time.sleep(10)
