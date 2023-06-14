@@ -1,6 +1,5 @@
 import requests
 import time
-import json
 from environs import Env
 
 import telegram
@@ -30,11 +29,11 @@ def get_notification(dvmn_token, payload={}):
     response = requests.get(
         url,
         headers=headers,
-        timeout=5,
+        timeout=90,
         params=payload,
     )
     response.raise_for_status()
-    return response.text
+    return response.json()
 
 
 if __name__ == "__main__":
@@ -43,15 +42,14 @@ if __name__ == "__main__":
     dvmn_token = env('DVMN_TOKEN')
     telegram_token = env('TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
+    payload = {}
     while True:
         try:
-            response = get_notification(dvmn_token)
-            dvmn_response = json.loads(response)
-            if dvmn_response['status'] == 'timeout':
-                payload = {'timestamp': dvmn_response['timestamp_to_request']}
-                get_notification(dvmn_token, payload)
-            elif dvmn_response['status'] == 'found':
-                lessons = dvmn_response['new_attempts']
+            review_lessons = get_notification(dvmn_token, payload)
+            if review_lessons['status'] == 'timeout':
+                payload = {'timestamp': review_lessons['timestamp_to_request']}
+            elif review_lessons['status'] == 'found':
+                lessons = review_lessons['new_attempts']
                 send_message(lessons, telegram_token, tg_chat_id)
         except requests.exceptions.HTTPError as err:
             print('Ooops. HTTP Error occurred')
