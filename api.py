@@ -35,12 +35,12 @@ def get_notification(dvmn_token, telegram_token, chat_id, payload={}):
             params=payload,
         )
         response.raise_for_status()
-        json_response = json.loads(response.text)
-        if json_response['status'] == 'timeout':
-            payload = {'timestamp': json_response['timestamp_to_request']}
+        dvmn_response = json.loads(response.text)
+        if dvmn_response['status'] == 'timeout':
+            payload = {'timestamp': dvmn_response['timestamp_to_request']}
             get_notification(dvmn_token, payload)
-        elif json_response['status'] == 'found':
-            lessons = json_response['new_attempts']
+        elif dvmn_response['status'] == 'found':
+            lessons = dvmn_response['new_attempts']
             send_message(lessons, telegram_token, chat_id)
     except requests.exceptions.HTTPError as err:
         print('Ooops. HTTP Error occurred')
