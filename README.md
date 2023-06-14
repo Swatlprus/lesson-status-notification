@@ -22,11 +22,11 @@ pip3 install -r requirements.txt
 ```
 DVMN_TOKEN=Token 5e97a8f265e4bfdb
 TELEGRAM_TOKEN=65520:AAExux2WuW-GnfEzvAxEgan0g7o
-CHAT_ID=316445592
+TG_CHAT_ID=316445592
 ```
 DVMN_TOKEN - Токен ключ от сайт Devman. Смотреть здесь - https://dvmn.org/api/docs/
 TELEGRAM_TOKEN - Токен от Telegram бота. Создать его можно через https://t.me/BotFather
-CHAT_ID - Уникальный ID чата. Узнать свой можно с помощью бота - https://t.me/userinfobot
+TG_CHAT_ID - Уникальный ID чата. Узнать свой можно с помощью бота - https://t.me/userinfobot
 
 ## Как запустить
 Команда для запуска проекта локально (Linux):

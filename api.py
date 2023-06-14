@@ -6,7 +6,7 @@ from environs import Env
 import telegram
 
 
-def send_message(lessons, telegram_token, chat_id):
+def send_message(lessons, telegram_token, tg_chat_id):
     for lesson in lessons:
         lesson_title = lesson['lesson_title']
         error = lesson['is_negative']
@@ -18,7 +18,7 @@ def send_message(lessons, telegram_token, chat_id):
                 можно приступать к следующему уроку!'
         bot = telegram.Bot(token=telegram_token)
         bot.send_message(
-            chat_id=chat_id,
+            chat_id=tg_chat_id,
             text=f'У вас проверили работу «{lesson_title}» \n\n{description}\
                 \n\nСсылка на урок: {url}'
         )
@@ -62,6 +62,6 @@ if __name__ == "__main__":
     env.read_env()
     dvmn_token = env('DVMN_TOKEN')
     telegram_token = env('TELEGRAM_TOKEN')
-    chat_id = env('CHAT_ID')
+    tg_chat_id = env('CHAT_ID')
     while True:
-        get_notification(dvmn_token, telegram_token, chat_id)
+        get_notification(dvmn_token, telegram_token, tg_chat_id)
