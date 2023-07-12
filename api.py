@@ -55,11 +55,12 @@ if __name__ == "__main__":
     env.read_env()
     dvmn_token = env('DVMN_TOKEN')
     telegram_token = env('TELEGRAM_TOKEN')
+    reserve_telegram_token = env('RESERVE_TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
     payload = {}
     logger = logging.getLogger('Logger')
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(TelegramLogsHandler(telegram_token, tg_chat_id))
+    logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
     while True:
         try:
             logger.info('Бот начал работу')
