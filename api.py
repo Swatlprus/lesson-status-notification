@@ -51,15 +51,15 @@ def get_notification(dvmn_token, payload={}):
 
 
 if __name__ == "__main__":
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
-    logger.info('Бот начал работу')
     env = Env()
     env.read_env()
     dvmn_token = env('DVMN_TOKEN')
     telegram_token = env('TELEGRAM_TOKEN')
     reserve_telegram_token = env('RESERVE_TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
+    logger.info('Бот начал работу')
     payload = {}
     while True:
         try:
