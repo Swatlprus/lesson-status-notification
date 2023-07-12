@@ -2,10 +2,10 @@ import requests
 import time
 from environs import Env
 import logging
-import traceback
 
 import telegram
 
+logger = logging.getLogger('Logger')
 
 class TelegramLogsHandler(logging.Handler):
 
@@ -51,6 +51,9 @@ def get_notification(dvmn_token, payload={}):
 
 
 if __name__ == "__main__":
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
+    logger.info('Бот начал работу')
     env = Env()
     env.read_env()
     dvmn_token = env('DVMN_TOKEN')
@@ -58,10 +61,6 @@ if __name__ == "__main__":
     reserve_telegram_token = env('RESERVE_TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
     payload = {}
-    logger = logging.getLogger('Logger')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
-    logger.info('Бот начал работу')
     while True:
         try:
             review_lessons = get_notification(dvmn_token, payload)
@@ -70,18 +69,11 @@ if __name__ == "__main__":
             elif review_lessons['status'] == 'found':
                 lessons = review_lessons['new_attempts']
                 send_message(lessons, telegram_token, tg_chat_id)
-        except requests.exceptions.HTTPError as err:
+        except requests.exceptions.HTTPError:
             logger.error('Бот упал с ошибкой HTTPError')
-            print('Ooops. HTTP Error occurred')
-            print('Response is: {content}'.format(content=err.response.content))
         except requests.exceptions.ReadTimeout:
-            print('Wait... I will try to send the request again')
-        except requests.exceptions.ConnectionError as err:
+            logger.info('Wait... I will try to send the request again')
+        except requests.exceptions.ConnectionError:
             logger.error('Бот упал с ошибкой ConnectionError')
-            print('Ooops. ConnectionError occurred')
-            print('Response is: {content}'.format(content=err))
-            print('Wait... I will try to send the request again')
             time.sleep(10)
-        except ZeroDivisionError as err:
-            logger.error(err)
-            logger.error(traceback.format_exc())
+
