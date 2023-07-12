@@ -1,8 +1,21 @@
 import requests
 import time
 from environs import Env
+import logging
 
 import telegram
+
+
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, telegram_token, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = telegram.Bot(token=telegram_token)
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
 
 
 def send_message(lessons, telegram_token, tg_chat_id):
@@ -43,8 +56,12 @@ if __name__ == "__main__":
     telegram_token = env('TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
     payload = {}
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(TelegramLogsHandler(telegram_token, tg_chat_id))
     while True:
         try:
+            logger.info('Бот начал работу')
             review_lessons = get_notification(dvmn_token, payload)
             if review_lessons['status'] == 'timeout':
                 payload = {'timestamp': review_lessons['timestamp_to_request']}
@@ -52,11 +69,14 @@ if __name__ == "__main__":
                 lessons = review_lessons['new_attempts']
                 send_message(lessons, telegram_token, tg_chat_id)
         except requests.exceptions.HTTPError as err:
+            logger.error('Бот упал с ошибкой HTTPError')
             print('Ooops. HTTP Error occurred')
             print('Response is: {content}'.format(content=err.response.content))
         except requests.exceptions.ReadTimeout:
+            logger.error('Бот упал с ошибкой ReadTimeout')
             print('Wait... I will try to send the request again')
         except requests.exceptions.ConnectionError as err:
+            logger.error('Бот упал с ошибкой ConnectionError')
             print('Ooops. ConnectionError occurred')
             print('Response is: {content}'.format(content=err))
             print('Wait... I will try to send the request again')
