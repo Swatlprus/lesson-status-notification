@@ -2,6 +2,7 @@ import requests
 import time
 from environs import Env
 import logging
+import traceback
 
 import telegram
 
@@ -81,3 +82,6 @@ if __name__ == "__main__":
             print('Response is: {content}'.format(content=err))
             print('Wait... I will try to send the request again')
             time.sleep(10)
+        except ZeroDivisionError as err:
+            logger.error(err)
+            logger.error(traceback.format_exc())
