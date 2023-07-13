@@ -69,6 +69,7 @@ if __name__ == "__main__":
                 payload = {'timestamp': review_lessons['timestamp_to_request']}
             elif review_lessons['status'] == 'found':
                 lessons = review_lessons['new_attempts']
+                payload = {'timestamp': review_lessons['timestamp_to_request']}
                 send_message(lessons, telegram_token, tg_chat_id)
         except requests.exceptions.HTTPError:
             logger.error('Бот упал с ошибкой HTTPError')
