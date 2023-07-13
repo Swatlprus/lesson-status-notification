@@ -7,6 +7,7 @@ import telegram
 
 logger = logging.getLogger('Logger')
 
+
 class TelegramLogsHandler(logging.Handler):
 
     def __init__(self, telegram_token, chat_id):
@@ -57,7 +58,7 @@ if __name__ == "__main__":
     telegram_token = env('TELEGRAM_TOKEN')
     reserve_telegram_token = env('RESERVE_TELEGRAM_TOKEN')
     tg_chat_id = env('TG_CHAT_ID')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.addHandler(TelegramLogsHandler(reserve_telegram_token, tg_chat_id))
     logger.info('Бот начал работу')
     payload = {}
@@ -72,8 +73,7 @@ if __name__ == "__main__":
         except requests.exceptions.HTTPError:
             logger.error('Бот упал с ошибкой HTTPError')
         except requests.exceptions.ReadTimeout:
-            logger.info('Wait... I will try to send the request again')
+            logger.debug('Wait... I will try to send the request again')
         except requests.exceptions.ConnectionError:
             logger.error('Бот упал с ошибкой ConnectionError')
             time.sleep(10)
-
